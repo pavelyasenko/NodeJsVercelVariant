@@ -671,21 +671,6 @@ const loadImages = async (
 const removeMarkdownWrapper = (
   value: string,
 ): string => {
-  let result = value.trim();
-
-  result = result.replace(
-    /^```(?:html|HTML)?\s*/i,
-    "",
-  );
-
-  result = result.replace(/\s*```$/i, "");
-
-  return result.trim();
-};
-
-const removeMarkdownWrapper = (
-  value: string,
-): string => {
   return value
     .trim()
     .replace(/^```(?:html)?\s*/i, "")
