@@ -683,65 +683,20 @@ const removeMarkdownWrapper = (
   return result.trim();
 };
 
-const repairHtmlDocument = (
-  html: string,
+const removeMarkdownWrapper = (
+  value: string,
 ): string => {
-  let result = html.trim();
-
-  if (!/^<!doctype html>/i.test(result)) {
-    result = `<!DOCTYPE html>\n${result}`;
-  }
-
-  if (!/<html[\s>]/i.test(result)) {
-    result = result.replace(
-      /^<!doctype html>\s*/i,
-      "<!DOCTYPE html>\n<html lang=\"en\">\n",
-    );
-  }
-
-  if (!/<head[\s>]/i.test(result)) {
-    result = result.replace(
-      /<html([^>]*)>/i,
-      `<html$1>\n<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-</head>`,
-    );
-  }
-
-  if (!/<body[\s>]/i.test(result)) {
-    const headEndIndex =
-      result.toLowerCase().indexOf("</head>");
-
-    if (headEndIndex !== -1) {
-      const insertionIndex =
-        headEndIndex + "</head>".length;
-
-      result =
-        result.slice(0, insertionIndex) +
-        "\n<body>\n" +
-        result.slice(insertionIndex);
-    } else {
-      result += "\n<body>";
-    }
-  }
-
-  if (!/<\/body>/i.test(result)) {
-    result += "\n</body>";
-  }
-
-  if (!/<\/html>/i.test(result)) {
-    result += "\n</html>";
-  }
-
-  return result.trim();
+  return value
+    .trim()
+    .replace(/^```(?:html)?\s*/i, "")
+    .replace(/\s*```$/i, "")
+    .trim();
 };
 
 const extractHtmlDocument = (
   rawResponse: string,
 ): string => {
-  const cleaned =
-    removeMarkdownWrapper(rawResponse);
+  const cleaned = removeMarkdownWrapper(rawResponse);
 
   const doctypeIndex =
     cleaned.search(/<!doctype html>/i);
@@ -756,10 +711,6 @@ const extractHtmlDocument = (
 
   if (startIndex === -1) {
     console.error(
-      "Gemini response does not contain HTML.",
-    );
-
-    console.error(
       "Gemini response start:",
       rawResponse.slice(0, 1500),
     );
@@ -770,29 +721,69 @@ const extractHtmlDocument = (
     );
 
     throw new Error(
-      "Gemini response does not contain HTML",
+      "Gemini response does not contain an HTML document",
     );
   }
 
-  let html = cleaned.slice(startIndex);
+  const document =
+    cleaned.slice(startIndex);
 
   const endIndex =
-    html.toLowerCase().lastIndexOf("</html>");
+    document.toLowerCase().lastIndexOf("</html>");
 
-  if (endIndex !== -1) {
-    html = html.slice(
-      0,
-      endIndex + "</html>".length,
+  if (endIndex === -1) {
+    throw new Error(
+      "Gemini returned an incomplete HTML document",
     );
-  } else {
-    console.warn(
-      "Gemini response was incomplete. Closing HTML tags were restored.",
-    );
-
-    html = repairHtmlDocument(html);
   }
 
-  return html.trim();
+  const html = document
+    .slice(
+      0,
+      endIndex + "</html>".length,
+    )
+    .trim();
+
+  const bodyMatch = html.match(
+    /<body[^>]*>([\s\S]*?)<\/body>/i,
+  );
+
+  if (!bodyMatch) {
+    throw new Error(
+      "Gemini response does not contain a complete body",
+    );
+  }
+
+  const bodyContent = bodyMatch[1]
+    .replace(
+      /<script[\s\S]*?<\/script>/gi,
+      "",
+    )
+    .replace(
+      /<style[\s\S]*?<\/style>/gi,
+      "",
+    )
+    .replace(
+      /<!--[\s\S]*?-->/g,
+      "",
+    )
+    .replace(
+      /<[^>]+>/g,
+      "",
+    )
+    .replace(
+      /\s+/g,
+      " ",
+    )
+    .trim();
+
+  if (bodyContent.length < 50) {
+    throw new Error(
+      "Gemini returned an empty HTML body",
+    );
+  }
+
+  return html;
 };
 
 const removeUnsafeOrUnwantedAttributes = (
@@ -891,6 +882,45 @@ const assertValidGeneratedHtml = (
     );
   }
 
+  const bodyMatch = html.match(
+    /<body[^>]*>([\s\S]*?)<\/body>/i,
+  );
+
+  if (!bodyMatch) {
+    throw new Error(
+      "Generated HTML does not contain a complete body",
+    );
+  }
+
+  const visibleBodyText = bodyMatch[1]
+    .replace(
+      /<script[\s\S]*?<\/script>/gi,
+      "",
+    )
+    .replace(
+      /<style[\s\S]*?<\/style>/gi,
+      "",
+    )
+    .replace(
+      /<!--[\s\S]*?-->/g,
+      "",
+    )
+    .replace(
+      /<[^>]+>/g,
+      "",
+    )
+    .replace(
+      /\s+/g,
+      " ",
+    )
+    .trim();
+
+  if (visibleBodyText.length < 50) {
+    throw new Error(
+      "Generated HTML body is empty",
+    );
+  }
+
   const remainingPlaceholder =
     Object.values(IMAGE_PLACEHOLDERS).find(
       (placeholder) =>
@@ -923,45 +953,109 @@ const generateHtmlWithGemini = async (
     generativeAI.getGenerativeModel({
       model: GEMINI_MODEL,
       generationConfig: {
-        temperature: 0.65,
+        temperature: 0.55,
         topP: 0.9,
         maxOutputTokens: 16384,
       },
     });
 
-  const prompt = buildPrompt(formData);
+  const basePrompt = buildPrompt(formData);
+  let lastError: Error | null = null;
 
-  const response =
-    await model.generateContent(prompt);
-
-  const rawText =
-    response.response.text();
-
-  console.log(
-    "Gemini response length:",
-    rawText.length,
-  );
-
-  console.log(
-    "Gemini response start:",
-    rawText.slice(0, 500),
-  );
-
-  console.log(
-    "Gemini response end:",
-    rawText.slice(-500),
-  );
-
-  if (
-    !rawText ||
-    rawText.trim().length === 0
+  for (
+    let attempt = 1;
+    attempt <= 3;
+    attempt += 1
   ) {
-    throw new Error(
-      "Gemini returned an empty response",
-    );
+    try {
+      const retryInstruction =
+        attempt === 1
+          ? ""
+          : `
+
+ПРЕДЫДУЩИЙ ОТВЕТ БЫЛ ОБРЕЗАН, ПУСТ ИЛИ НЕПОЛОН.
+
+Сгенерируй страницу заново и сделай HTML компактнее:
+- Не добавляй HTML-комментарии.
+- Не дублируй секции.
+- Не добавляй лишние декоративные элементы.
+- Сократи JavaScript, но сохрани требуемую функциональность.
+- Не используй длинные SVG и base64.
+- Обязательно создай полноценный <body> с видимым содержимым.
+- Обязательно закончи документ тегом </html>.
+- Верни только полный HTML-документ.`;
+
+      console.log(
+        `Gemini generation attempt ${attempt}/3`,
+      );
+
+      const response =
+        await model.generateContent(
+          basePrompt + retryInstruction,
+        );
+
+      const rawText =
+        response.response.text();
+
+      const candidate =
+        response.response.candidates?.[0];
+
+      console.log(
+        "Gemini response info:",
+        {
+          attempt,
+          length: rawText.length,
+          finishReason:
+            candidate?.finishReason,
+        },
+      );
+
+      console.log(
+        "Gemini response start:",
+        rawText.slice(0, 500),
+      );
+
+      console.log(
+        "Gemini response end:",
+        rawText.slice(-500),
+      );
+
+      if (!rawText.trim()) {
+        throw new Error(
+          "Gemini returned an empty response",
+        );
+      }
+
+      const html =
+        extractHtmlDocument(rawText);
+
+      console.log(
+        "Valid generated HTML length:",
+        html.length,
+      );
+
+      return html;
+    } catch (error) {
+      lastError =
+        error instanceof Error
+          ? error
+          : new Error(
+              "Unknown Gemini generation error",
+            );
+
+      console.error(
+        `Gemini attempt ${attempt} failed:`,
+        lastError.message,
+      );
+    }
   }
 
-  return extractHtmlDocument(rawText);
+  throw new Error(
+    `Gemini failed after 3 attempts: ${
+      lastError?.message ||
+      "Unknown generation error"
+    }`,
+  );
 };
 
 export const generateWebsiteData = async (
