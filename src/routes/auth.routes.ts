@@ -4,8 +4,8 @@ import {
     loginHandler, 
     logoutHandler, 
     registerHandler 
-} from "../controllers/auth.controllers";
-import { authMiddleware } from "../middlewares/auth.middleware";
+} from "../controllers/auth.controllers.js";
+import { authMiddleware } from "../middlewares/auth.middleware.js";
 
 
 

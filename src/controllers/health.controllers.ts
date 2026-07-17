@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { checkServerHealth } from "../services/health.service"
+import { checkServerHealth } from "../services/health.service.js"
 
 export const getHealthHandler = (req:Request, res:Response ): void => {
     try{

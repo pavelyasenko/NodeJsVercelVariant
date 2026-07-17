@@ -1,4 +1,4 @@
-import { prisma } from "../config/db";
+import { prisma } from "../config/db.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
@@ -16,7 +16,6 @@ interface ChangePasswordData {
     oldPassword: string;
     newPassword: string;
 }
-
 
 interface AuthResponse {
     success: boolean;

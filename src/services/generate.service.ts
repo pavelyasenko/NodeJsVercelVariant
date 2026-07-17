@@ -1,5 +1,5 @@
-import { prisma } from "../config/db";
-import { AppFormData, generateWebsiteData } from "./ai.service";
+import { prisma } from "../config/db.js";
+import { AppFormData, generateWebsiteData } from "./ai.service.js";
 
 const GENERATION_COSTS: Record<AppFormData["Complexity"], number> = {
   Minimal: 25,

@@ -1,5 +1,5 @@
 import { Response, Request } from "express";
-import { balanceService } from "../services/balance.service"
+import { balanceService } from "../services/balance.service.js"
 
 export const getBalanceHandler = async (req:Request, res:Response):Promise<void> =>{
     try {

@@ -1,5 +1,5 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { getImage } from "./pexels.service";
+import { getImage } from "./pexels.service.js";
 
 export interface AppFormData {
   ProjectName: string;

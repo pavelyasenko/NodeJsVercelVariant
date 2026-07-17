@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { generateService } from "../services/generate.service";
+import { generateService } from "../services/generate.service.js";
 
 export const generateController = {
   async generate (req:Request, res:Response) {
