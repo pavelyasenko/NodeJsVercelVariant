@@ -17,6 +17,7 @@ interface ChangePasswordData {
     newPassword: string;
 }
 
+
 interface AuthResponse {
     success: boolean;
     token: string;
