@@ -38,8 +38,11 @@ interface GeneratedImages {
   review3: string;
 }
 
-const GEMINI_MODEL = process.env.GEMINI_MODEL?.trim() || "gemini-2.5-flash";
-const DEBUG_MODE = process.env.GENERATE_WEBSITE_DEBUG === "true";
+const GEMINI_MODEL =
+  process.env.GEMINI_MODEL?.trim() || "gemini-2.5-flash";
+
+const DEBUG_MODE =
+  process.env.GENERATE_WEBSITE_DEBUG === "true";
 
 const IMAGE_PLACEHOLDERS = {
   hero: "{{HERO_IMAGE}}",
@@ -119,7 +122,9 @@ const MOCK_HTML = `<!DOCTYPE html>
 </body>
 </html>`;
 
-const normalizeFormData = (formData: AppFormData): AppFormData => {
+const normalizeFormData = (
+  formData: AppFormData,
+): AppFormData => {
   const normalized: AppFormData = {
     ProjectName: formData.ProjectName?.trim(),
     Description: formData.Description?.trim(),
@@ -159,7 +164,9 @@ const normalizeFormData = (formData: AppFormData): AppFormData => {
   return normalized;
 };
 
-const getComplexityDirectives = (complexity: Complexity): string => {
+const getComplexityDirectives = (
+  complexity: Complexity,
+): string => {
   switch (complexity) {
     case "Minimal":
       return `
@@ -222,15 +229,23 @@ const getComplexityDirectives = (complexity: Complexity): string => {
   }
 };
 
-const escapeForSingleQuotedJavaScript = (value: string): string =>
-  value.replace(/\\/g, "\\\\").replace(/'/g, "\\'").replace(/\r?\n/g, " ");
+const escapeForSingleQuotedJavaScript = (
+  value: string,
+): string =>
+  value
+    .replace(/\\/g, "\\\\")
+    .replace(/'/g, "\\'")
+    .replace(/\r?\n/g, " ");
 
-const getFacebookPixelSnippet = (pixelId?: string): string => {
+const getFacebookPixelSnippet = (
+  pixelId?: string,
+): string => {
   if (!pixelId) {
     return "";
   }
 
-  const safePixelId = escapeForSingleQuotedJavaScript(pixelId);
+  const safePixelId =
+    escapeForSingleQuotedJavaScript(pixelId);
 
   return `
 <!-- Facebook Pixel Code -->
@@ -272,9 +287,14 @@ const getFacebookPixelSnippet = (pixelId?: string): string => {
 <!-- End Facebook Pixel Code -->`;
 };
 
-const buildPrompt = (formData: AppFormData): string => {
-  const complexityDirectives = getComplexityDirectives(formData.Complexity);
-  const pixelSnippet = getFacebookPixelSnippet(formData.FBPixelID);
+const buildPrompt = (
+  formData: AppFormData,
+): string => {
+  const complexityDirectives =
+    getComplexityDirectives(formData.Complexity);
+
+  const pixelSnippet =
+    getFacebookPixelSnippet(formData.FBPixelID);
 
   return `
 Ты — профессиональный Full-Stack разработчик и UX/UI дизайнер.
@@ -282,10 +302,15 @@ const buildPrompt = (formData: AppFormData): string => {
 Создай готовый адаптивный одностраничный коммерческий сайт.
 
 ФОРМАТ:
-- Верни только валидный HTML от <!DOCTYPE html> до </html>.
-- Не используй Markdown и не добавляй объяснения.
+- Верни только один валидный HTML-документ.
+- Документ должен начинаться с <!DOCTYPE html>.
+- Документ должен содержать <html>, <head> и <body>.
+- Документ должен заканчиваться </html>.
+- Не используй Markdown-блоки \`\`\`.
+- Не добавляй объяснения до или после HTML.
 - Используй Tailwind CSS через CDN.
 - Используй только Vanilla JavaScript и addEventListener.
+- Не сокращай код и не используй комментарии вместо разметки.
 
 ДАННЫЕ:
 - Название: "${formData.ProjectName}"
@@ -408,7 +433,9 @@ ${
 - Hero использует HERO_IMAGE как фон.
 - Overlay не блокирует клики.
 - Нет Canvas, игры и комментариев.
-- HTML начинается с <!DOCTYPE html> и заканчивается </html>.
+- HTML начинается с <!DOCTYPE html>.
+- HTML заканчивается </html>.
+- После </html> нет никакого текста.
 
 Верни только чистый HTML.
 `.trim();
@@ -421,20 +448,32 @@ const safeGetImage = async (
   try {
     const image = await getImage(query);
 
-    if (typeof image !== "string" || image.trim().length === 0) {
+    if (
+      typeof image !== "string" ||
+      image.trim().length === 0
+    ) {
       return fallback;
     }
 
     return image.trim();
   } catch (error) {
-    console.error(`Failed to load image for query "${query}":`, error);
+    console.error(
+      `Failed to load image for query "${query}":`,
+      error,
+    );
+
     return fallback;
   }
 };
 
-const detectImageQueries = (formData: AppFormData): string[] => {
-  const text = `${formData.ProjectName} ${formData.Description}`.toLowerCase();
-  const has = (...words: string[]) => words.some((word) => text.includes(word));
+const detectImageQueries = (
+  formData: AppFormData,
+): string[] => {
+  const text =
+    `${formData.ProjectName} ${formData.Description}`.toLowerCase();
+
+  const has = (...words: string[]) =>
+    words.some((word) => text.includes(word));
 
   if (has("суш", "ролл", "sushi", "japanese food")) {
     return [
@@ -457,7 +496,14 @@ const detectImageQueries = (formData: AppFormData): string[] => {
   }
 
   if (
-    has("компьютерн", "пк клуб", "pc club", "gaming club", "кибер", "esports")
+    has(
+      "компьютерн",
+      "пк клуб",
+      "pc club",
+      "gaming club",
+      "кибер",
+      "esports",
+    )
   ) {
     return [
       "gaming pc club neon computers",
@@ -478,7 +524,9 @@ const detectImageQueries = (formData: AppFormData): string[] => {
     ];
   }
 
-  if (has("кофе", "кофейн", "coffee", "cafe", "кафе")) {
+  if (
+    has("кофе", "кофейн", "coffee", "cafe", "кафе")
+  ) {
     return [
       "coffee shop cozy interior",
       "barista making coffee",
@@ -499,7 +547,13 @@ const detectImageQueries = (formData: AppFormData): string[] => {
   }
 
   if (
-    has("автосервис", "ремонт авто", "car service", "auto repair", "шиномонтаж")
+    has(
+      "автосервис",
+      "ремонт авто",
+      "car service",
+      "auto repair",
+      "шиномонтаж",
+    )
   ) {
     return [
       "modern auto repair garage",
@@ -520,7 +574,16 @@ const detectImageQueries = (formData: AppFormData): string[] => {
     ];
   }
 
-  if (has("салон", "маникюр", "стриж", "beauty", "hair salon", "spa")) {
+  if (
+    has(
+      "салон",
+      "маникюр",
+      "стриж",
+      "beauty",
+      "hair salon",
+      "spa",
+    )
+  ) {
     return [
       "luxury beauty salon interior",
       "beauty salon professional",
@@ -541,7 +604,8 @@ const detectImageQueries = (formData: AppFormData): string[] => {
   }
 
   const base =
-    formData.ProjectName.replace(/[^\p{L}\p{N}\s-]/gu, " ")
+    formData.ProjectName
+      .replace(/[^\p{L}\p{N}\s-]/gu, " ")
       .replace(/\s+/g, " ")
       .trim() || "modern business";
 
@@ -564,14 +628,22 @@ const detectImageQueries = (formData: AppFormData): string[] => {
   ];
 };
 
-const loadImages = async (formData: AppFormData): Promise<GeneratedImages> => {
+const loadImages = async (
+  formData: AppFormData,
+): Promise<GeneratedImages> => {
   const queries = detectImageQueries(formData);
 
   const images = await Promise.all([
     ...queries.map((query) => safeGetImage(query)),
-    safeGetImage("happy customer portrait professional"),
-    safeGetImage("happy customer portrait smiling"),
-    safeGetImage("happy customer portrait business"),
+    safeGetImage(
+      "happy customer portrait professional",
+    ),
+    safeGetImage(
+      "happy customer portrait smiling",
+    ),
+    safeGetImage(
+      "happy customer portrait business",
+    ),
   ]);
 
   return {
@@ -596,34 +668,149 @@ const loadImages = async (formData: AppFormData): Promise<GeneratedImages> => {
   };
 };
 
-const removeMarkdownWrapper = (value: string): string => {
+const removeMarkdownWrapper = (
+  value: string,
+): string => {
   let result = value.trim();
 
-  result = result.replace(/^```(?:html)?\s*/i, "");
+  result = result.replace(
+    /^```(?:html|HTML)?\s*/i,
+    "",
+  );
+
   result = result.replace(/\s*```$/i, "");
 
   return result.trim();
 };
 
-const extractHtmlDocument = (value: string): string => {
-  const cleaned = removeMarkdownWrapper(value);
-  const startIndex = cleaned.search(/<!DOCTYPE html>/i);
-  const endIndex = cleaned.toLowerCase().lastIndexOf("</html>");
+const repairHtmlDocument = (
+  html: string,
+): string => {
+  let result = html.trim();
 
-  if (startIndex === -1 || endIndex === -1) {
-    throw new Error(
-      "Gemini response does not contain a complete HTML document",
+  if (!/^<!doctype html>/i.test(result)) {
+    result = `<!DOCTYPE html>\n${result}`;
+  }
+
+  if (!/<html[\s>]/i.test(result)) {
+    result = result.replace(
+      /^<!doctype html>\s*/i,
+      "<!DOCTYPE html>\n<html lang=\"en\">\n",
     );
   }
 
-  return cleaned.slice(startIndex, endIndex + "</html>".length).trim();
+  if (!/<head[\s>]/i.test(result)) {
+    result = result.replace(
+      /<html([^>]*)>/i,
+      `<html$1>\n<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+</head>`,
+    );
+  }
+
+  if (!/<body[\s>]/i.test(result)) {
+    const headEndIndex =
+      result.toLowerCase().indexOf("</head>");
+
+    if (headEndIndex !== -1) {
+      const insertionIndex =
+        headEndIndex + "</head>".length;
+
+      result =
+        result.slice(0, insertionIndex) +
+        "\n<body>\n" +
+        result.slice(insertionIndex);
+    } else {
+      result += "\n<body>";
+    }
+  }
+
+  if (!/<\/body>/i.test(result)) {
+    result += "\n</body>";
+  }
+
+  if (!/<\/html>/i.test(result)) {
+    result += "\n</html>";
+  }
+
+  return result.trim();
 };
 
-const removeUnsafeOrUnwantedAttributes = (html: string): string => {
+const extractHtmlDocument = (
+  rawResponse: string,
+): string => {
+  const cleaned =
+    removeMarkdownWrapper(rawResponse);
+
+  const doctypeIndex =
+    cleaned.search(/<!doctype html>/i);
+
+  const htmlIndex =
+    cleaned.search(/<html[\s>]/i);
+
+  const startIndex =
+    doctypeIndex !== -1
+      ? doctypeIndex
+      : htmlIndex;
+
+  if (startIndex === -1) {
+    console.error(
+      "Gemini response does not contain HTML.",
+    );
+
+    console.error(
+      "Gemini response start:",
+      rawResponse.slice(0, 1500),
+    );
+
+    console.error(
+      "Gemini response end:",
+      rawResponse.slice(-1500),
+    );
+
+    throw new Error(
+      "Gemini response does not contain HTML",
+    );
+  }
+
+  let html = cleaned.slice(startIndex);
+
+  const endIndex =
+    html.toLowerCase().lastIndexOf("</html>");
+
+  if (endIndex !== -1) {
+    html = html.slice(
+      0,
+      endIndex + "</html>".length,
+    );
+  } else {
+    console.warn(
+      "Gemini response was incomplete. Closing HTML tags were restored.",
+    );
+
+    html = repairHtmlDocument(html);
+  }
+
+  return html.trim();
+};
+
+const removeUnsafeOrUnwantedAttributes = (
+  html: string,
+): string => {
   return html
-    .replace(/\s+integrity=(["']).*?\1/gi, "")
-    .replace(/\s+crossorigin=(["']).*?\1/gi, "")
-    .replace(/\s+referrerpolicy=(["']).*?\1/gi, "");
+    .replace(
+      /\s+integrity=(["']).*?\1/gi,
+      "",
+    )
+    .replace(
+      /\s+crossorigin=(["']).*?\1/gi,
+      "",
+    )
+    .replace(
+      /\s+referrerpolicy=(["']).*?\1/gi,
+      "",
+    );
 };
 
 const replaceImagePlaceholders = (
@@ -632,49 +819,83 @@ const replaceImagePlaceholders = (
 ): string => {
   let result = html;
 
-  for (const key of Object.keys(IMAGE_PLACEHOLDERS) as Array<
-    keyof typeof IMAGE_PLACEHOLDERS
-  >) {
-    result = result.replaceAll(IMAGE_PLACEHOLDERS[key], images[key]);
+  for (
+    const key of Object.keys(
+      IMAGE_PLACEHOLDERS,
+    ) as Array<keyof typeof IMAGE_PLACEHOLDERS>
+  ) {
+    result = result.replaceAll(
+      IMAGE_PLACEHOLDERS[key],
+      images[key],
+    );
   }
 
   return result;
 };
 
-const replaceRemainingPlaceholders = (html: string): string => {
+const replaceRemainingPlaceholders = (
+  html: string,
+): string => {
   let result = html;
 
-  for (const placeholder of Object.values(IMAGE_PLACEHOLDERS)) {
-    result = result.replaceAll(placeholder, FALLBACK_IMAGE);
+  for (
+    const placeholder of Object.values(
+      IMAGE_PLACEHOLDERS,
+    )
+  ) {
+    result = result.replaceAll(
+      placeholder,
+      FALLBACK_IMAGE,
+    );
   }
 
   return result;
 };
 
-const assertValidGeneratedHtml = (html: string): void => {
-  if (!/^<!DOCTYPE html>/i.test(html)) {
-    throw new Error("Generated HTML must start with <!DOCTYPE html>");
+const assertValidGeneratedHtml = (
+  html: string,
+): void => {
+  if (!/^<!doctype html>/i.test(html)) {
+    throw new Error(
+      "Generated HTML must start with <!DOCTYPE html>",
+    );
   }
 
-  if (!/<html[\s>]/i.test(html) || !/<\/html>\s*$/i.test(html)) {
-    throw new Error("Generated HTML is incomplete");
+  if (
+    !/<html[\s>]/i.test(html) ||
+    !/<\/html>\s*$/i.test(html)
+  ) {
+    throw new Error(
+      "Generated HTML is incomplete",
+    );
   }
 
-  if (!/<head[\s>]/i.test(html) || !/<body[\s>]/i.test(html)) {
-    throw new Error("Generated HTML must contain head and body");
+  if (
+    !/<head[\s>]/i.test(html) ||
+    !/<body[\s>]/i.test(html)
+  ) {
+    throw new Error(
+      "Generated HTML must contain head and body",
+    );
   }
 
   if (/<canvas[\s>]/i.test(html)) {
-    throw new Error("Generated HTML contains forbidden canvas");
+    throw new Error(
+      "Generated HTML contains forbidden canvas",
+    );
   }
 
   if (html.includes("```")) {
-    throw new Error("Generated HTML contains Markdown wrapper");
+    throw new Error(
+      "Generated HTML contains Markdown wrapper",
+    );
   }
 
-  const remainingPlaceholder = Object.values(IMAGE_PLACEHOLDERS).find(
-    (placeholder) => html.includes(placeholder),
-  );
+  const remainingPlaceholder =
+    Object.values(IMAGE_PLACEHOLDERS).find(
+      (placeholder) =>
+        html.includes(placeholder),
+    );
 
   if (remainingPlaceholder) {
     throw new Error(
@@ -686,28 +907,58 @@ const assertValidGeneratedHtml = (html: string): void => {
 const generateHtmlWithGemini = async (
   formData: AppFormData,
 ): Promise<string> => {
-  const apiKey = process.env.GEMINI_API_KEY?.trim();
+  const apiKey =
+    process.env.GEMINI_API_KEY?.trim();
 
   if (!apiKey) {
-    throw new Error("GEMINI_API_KEY is not configured");
+    throw new Error(
+      "GEMINI_API_KEY is not configured",
+    );
   }
 
-  const generativeAI = new GoogleGenerativeAI(apiKey);
-  const model = generativeAI.getGenerativeModel({
-    model: GEMINI_MODEL,
-    generationConfig: {
-      temperature: 0.75,
-      topP: 0.9,
-      maxOutputTokens: 16384,
-    },
-  });
+  const generativeAI =
+    new GoogleGenerativeAI(apiKey);
+
+  const model =
+    generativeAI.getGenerativeModel({
+      model: GEMINI_MODEL,
+      generationConfig: {
+        temperature: 0.65,
+        topP: 0.9,
+        maxOutputTokens: 16384,
+      },
+    });
 
   const prompt = buildPrompt(formData);
-  const response = await model.generateContent(prompt);
-  const rawText = response.response.text();
 
-  if (!rawText || rawText.trim().length === 0) {
-    throw new Error("Gemini returned an empty response");
+  const response =
+    await model.generateContent(prompt);
+
+  const rawText =
+    response.response.text();
+
+  console.log(
+    "Gemini response length:",
+    rawText.length,
+  );
+
+  console.log(
+    "Gemini response start:",
+    rawText.slice(0, 500),
+  );
+
+  console.log(
+    "Gemini response end:",
+    rawText.slice(-500),
+  );
+
+  if (
+    !rawText ||
+    rawText.trim().length === 0
+  ) {
+    throw new Error(
+      "Gemini returned an empty response",
+    );
   }
 
   return extractHtmlDocument(rawText);
@@ -716,10 +967,13 @@ const generateHtmlWithGemini = async (
 export const generateWebsiteData = async (
   rawFormData: AppFormData,
 ): Promise<LandingPageData> => {
-  const formData = normalizeFormData(rawFormData);
+  const formData =
+    normalizeFormData(rawFormData);
 
   if (DEBUG_MODE) {
-    console.log("Generate website debug mode is enabled");
+    console.log(
+      "Generate website debug mode is enabled",
+    );
 
     return {
       success: true,
@@ -728,18 +982,33 @@ export const generateWebsiteData = async (
   }
 
   try {
-    const generatedHtml = await generateHtmlWithGemini(formData);
-    const images = await loadImages(formData);
+    const generatedHtml =
+      await generateHtmlWithGemini(formData);
 
-    let html = replaceImagePlaceholders(generatedHtml, images);
-    html = replaceRemainingPlaceholders(html);
-    html = removeUnsafeOrUnwantedAttributes(html);
+    const images =
+      await loadImages(formData);
+
+    let html =
+      replaceImagePlaceholders(
+        generatedHtml,
+        images,
+      );
+
+    html =
+      replaceRemainingPlaceholders(html);
+
+    html =
+      removeUnsafeOrUnwantedAttributes(html);
+
     html = html
       .replace(
         /<section[^>]*(?:id|class)=["'][^"']*(?:game|mini-game|canvas-game|shooter|comments|comment-section)[^"']*["'][^>]*>[\s\S]*?<\/section>/gi,
         "",
       )
-      .replace(/<canvas[\s\S]*?<\/canvas>/gi, "");
+      .replace(
+        /<canvas[\s\S]*?<\/canvas>/gi,
+        "",
+      );
 
     assertValidGeneratedHtml(html);
 
@@ -748,12 +1017,19 @@ export const generateWebsiteData = async (
       html,
     };
   } catch (error) {
-    console.error("generateWebsiteData failed:", error);
+    console.error(
+      "generateWebsiteData failed:",
+      error,
+    );
 
     if (error instanceof Error) {
-      throw new Error(`Website generation failed: ${error.message}`);
+      throw new Error(
+        `Website generation failed: ${error.message}`,
+      );
     }
 
-    throw new Error("Website generation failed because of an unknown error");
+    throw new Error(
+      "Website generation failed because of an unknown error",
+    );
   }
 };
