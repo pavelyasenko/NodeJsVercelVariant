@@ -132,7 +132,13 @@ exports.Prisma.UserScalarFieldEnum = {
   password: 'password',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
-  token: 'token'
+  token: 'token',
+  telegramId: 'telegramId',
+  telegramUsername: 'telegramUsername',
+  telegramFirstName: 'telegramFirstName',
+  telegramLastName: 'telegramLastName',
+  telegramPhotoUrl: 'telegramPhotoUrl',
+  telegramLanguageCode: 'telegramLanguageCode'
 };
 
 exports.Prisma.GemeniResponseScalarFieldEnum = {

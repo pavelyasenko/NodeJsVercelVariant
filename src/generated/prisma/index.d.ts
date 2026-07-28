@@ -2166,6 +2166,12 @@ export namespace Prisma {
     createdAt: Date | null
     updatedAt: Date | null
     token: string | null
+    telegramId: string | null
+    telegramUsername: string | null
+    telegramFirstName: string | null
+    telegramLastName: string | null
+    telegramPhotoUrl: string | null
+    telegramLanguageCode: string | null
   }
 
   export type UserMaxAggregateOutputType = {
@@ -2175,6 +2181,12 @@ export namespace Prisma {
     createdAt: Date | null
     updatedAt: Date | null
     token: string | null
+    telegramId: string | null
+    telegramUsername: string | null
+    telegramFirstName: string | null
+    telegramLastName: string | null
+    telegramPhotoUrl: string | null
+    telegramLanguageCode: string | null
   }
 
   export type UserCountAggregateOutputType = {
@@ -2184,6 +2196,12 @@ export namespace Prisma {
     createdAt: number
     updatedAt: number
     token: number
+    telegramId: number
+    telegramUsername: number
+    telegramFirstName: number
+    telegramLastName: number
+    telegramPhotoUrl: number
+    telegramLanguageCode: number
     _all: number
   }
 
@@ -2195,6 +2213,12 @@ export namespace Prisma {
     createdAt?: true
     updatedAt?: true
     token?: true
+    telegramId?: true
+    telegramUsername?: true
+    telegramFirstName?: true
+    telegramLastName?: true
+    telegramPhotoUrl?: true
+    telegramLanguageCode?: true
   }
 
   export type UserMaxAggregateInputType = {
@@ -2204,6 +2228,12 @@ export namespace Prisma {
     createdAt?: true
     updatedAt?: true
     token?: true
+    telegramId?: true
+    telegramUsername?: true
+    telegramFirstName?: true
+    telegramLastName?: true
+    telegramPhotoUrl?: true
+    telegramLanguageCode?: true
   }
 
   export type UserCountAggregateInputType = {
@@ -2213,6 +2243,12 @@ export namespace Prisma {
     createdAt?: true
     updatedAt?: true
     token?: true
+    telegramId?: true
+    telegramUsername?: true
+    telegramFirstName?: true
+    telegramLastName?: true
+    telegramPhotoUrl?: true
+    telegramLanguageCode?: true
     _all?: true
   }
 
@@ -2290,11 +2326,17 @@ export namespace Prisma {
 
   export type UserGroupByOutputType = {
     id: string
-    email: string
-    password: string
+    email: string | null
+    password: string | null
     createdAt: Date
     updatedAt: Date
     token: string | null
+    telegramId: string | null
+    telegramUsername: string | null
+    telegramFirstName: string | null
+    telegramLastName: string | null
+    telegramPhotoUrl: string | null
+    telegramLanguageCode: string | null
     _count: UserCountAggregateOutputType | null
     _min: UserMinAggregateOutputType | null
     _max: UserMaxAggregateOutputType | null
@@ -2321,6 +2363,12 @@ export namespace Prisma {
     createdAt?: boolean
     updatedAt?: boolean
     token?: boolean
+    telegramId?: boolean
+    telegramUsername?: boolean
+    telegramFirstName?: boolean
+    telegramLastName?: boolean
+    telegramPhotoUrl?: boolean
+    telegramLanguageCode?: boolean
     balance?: boolean | User$balanceArgs<ExtArgs>
     gemeniResponses?: boolean | User$gemeniResponsesArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
@@ -2333,6 +2381,12 @@ export namespace Prisma {
     createdAt?: boolean
     updatedAt?: boolean
     token?: boolean
+    telegramId?: boolean
+    telegramUsername?: boolean
+    telegramFirstName?: boolean
+    telegramLastName?: boolean
+    telegramPhotoUrl?: boolean
+    telegramLanguageCode?: boolean
   }, ExtArgs["result"]["user"]>
 
   export type UserSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -2342,6 +2396,12 @@ export namespace Prisma {
     createdAt?: boolean
     updatedAt?: boolean
     token?: boolean
+    telegramId?: boolean
+    telegramUsername?: boolean
+    telegramFirstName?: boolean
+    telegramLastName?: boolean
+    telegramPhotoUrl?: boolean
+    telegramLanguageCode?: boolean
   }, ExtArgs["result"]["user"]>
 
   export type UserSelectScalar = {
@@ -2351,9 +2411,15 @@ export namespace Prisma {
     createdAt?: boolean
     updatedAt?: boolean
     token?: boolean
+    telegramId?: boolean
+    telegramUsername?: boolean
+    telegramFirstName?: boolean
+    telegramLastName?: boolean
+    telegramPhotoUrl?: boolean
+    telegramLanguageCode?: boolean
   }
 
-  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "email" | "password" | "createdAt" | "updatedAt" | "token", ExtArgs["result"]["user"]>
+  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "email" | "password" | "createdAt" | "updatedAt" | "token" | "telegramId" | "telegramUsername" | "telegramFirstName" | "telegramLastName" | "telegramPhotoUrl" | "telegramLanguageCode", ExtArgs["result"]["user"]>
   export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     balance?: boolean | User$balanceArgs<ExtArgs>
     gemeniResponses?: boolean | User$gemeniResponsesArgs<ExtArgs>
@@ -2370,11 +2436,17 @@ export namespace Prisma {
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
-      email: string
-      password: string
+      email: string | null
+      password: string | null
       createdAt: Date
       updatedAt: Date
       token: string | null
+      telegramId: string | null
+      telegramUsername: string | null
+      telegramFirstName: string | null
+      telegramLastName: string | null
+      telegramPhotoUrl: string | null
+      telegramLanguageCode: string | null
     }, ExtArgs["result"]["user"]>
     composites: {}
   }
@@ -2806,6 +2878,12 @@ export namespace Prisma {
     readonly createdAt: FieldRef<"User", 'DateTime'>
     readonly updatedAt: FieldRef<"User", 'DateTime'>
     readonly token: FieldRef<"User", 'String'>
+    readonly telegramId: FieldRef<"User", 'String'>
+    readonly telegramUsername: FieldRef<"User", 'String'>
+    readonly telegramFirstName: FieldRef<"User", 'String'>
+    readonly telegramLastName: FieldRef<"User", 'String'>
+    readonly telegramPhotoUrl: FieldRef<"User", 'String'>
+    readonly telegramLanguageCode: FieldRef<"User", 'String'>
   }
     
 
@@ -4451,7 +4529,13 @@ export namespace Prisma {
     password: 'password',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt',
-    token: 'token'
+    token: 'token',
+    telegramId: 'telegramId',
+    telegramUsername: 'telegramUsername',
+    telegramFirstName: 'telegramFirstName',
+    telegramLastName: 'telegramLastName',
+    telegramPhotoUrl: 'telegramPhotoUrl',
+    telegramLanguageCode: 'telegramLanguageCode'
   };
 
   export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
@@ -4613,22 +4697,34 @@ export namespace Prisma {
     OR?: UserWhereInput[]
     NOT?: UserWhereInput | UserWhereInput[]
     id?: StringFilter<"User"> | string
-    email?: StringFilter<"User"> | string
-    password?: StringFilter<"User"> | string
+    email?: StringNullableFilter<"User"> | string | null
+    password?: StringNullableFilter<"User"> | string | null
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
     token?: StringNullableFilter<"User"> | string | null
+    telegramId?: StringNullableFilter<"User"> | string | null
+    telegramUsername?: StringNullableFilter<"User"> | string | null
+    telegramFirstName?: StringNullableFilter<"User"> | string | null
+    telegramLastName?: StringNullableFilter<"User"> | string | null
+    telegramPhotoUrl?: StringNullableFilter<"User"> | string | null
+    telegramLanguageCode?: StringNullableFilter<"User"> | string | null
     balance?: XOR<UserBalanceNullableScalarRelationFilter, UserBalanceWhereInput> | null
     gemeniResponses?: GemeniResponseListRelationFilter
   }
 
   export type UserOrderByWithRelationInput = {
     id?: SortOrder
-    email?: SortOrder
-    password?: SortOrder
+    email?: SortOrderInput | SortOrder
+    password?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     token?: SortOrderInput | SortOrder
+    telegramId?: SortOrderInput | SortOrder
+    telegramUsername?: SortOrderInput | SortOrder
+    telegramFirstName?: SortOrderInput | SortOrder
+    telegramLastName?: SortOrderInput | SortOrder
+    telegramPhotoUrl?: SortOrderInput | SortOrder
+    telegramLanguageCode?: SortOrderInput | SortOrder
     balance?: UserBalanceOrderByWithRelationInput
     gemeniResponses?: GemeniResponseOrderByRelationAggregateInput
   }
@@ -4636,24 +4732,36 @@ export namespace Prisma {
   export type UserWhereUniqueInput = Prisma.AtLeast<{
     id?: string
     email?: string
+    telegramId?: string
     AND?: UserWhereInput | UserWhereInput[]
     OR?: UserWhereInput[]
     NOT?: UserWhereInput | UserWhereInput[]
-    password?: StringFilter<"User"> | string
+    password?: StringNullableFilter<"User"> | string | null
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
     token?: StringNullableFilter<"User"> | string | null
+    telegramUsername?: StringNullableFilter<"User"> | string | null
+    telegramFirstName?: StringNullableFilter<"User"> | string | null
+    telegramLastName?: StringNullableFilter<"User"> | string | null
+    telegramPhotoUrl?: StringNullableFilter<"User"> | string | null
+    telegramLanguageCode?: StringNullableFilter<"User"> | string | null
     balance?: XOR<UserBalanceNullableScalarRelationFilter, UserBalanceWhereInput> | null
     gemeniResponses?: GemeniResponseListRelationFilter
-  }, "id" | "email">
+  }, "id" | "email" | "telegramId">
 
   export type UserOrderByWithAggregationInput = {
     id?: SortOrder
-    email?: SortOrder
-    password?: SortOrder
+    email?: SortOrderInput | SortOrder
+    password?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     token?: SortOrderInput | SortOrder
+    telegramId?: SortOrderInput | SortOrder
+    telegramUsername?: SortOrderInput | SortOrder
+    telegramFirstName?: SortOrderInput | SortOrder
+    telegramLastName?: SortOrderInput | SortOrder
+    telegramPhotoUrl?: SortOrderInput | SortOrder
+    telegramLanguageCode?: SortOrderInput | SortOrder
     _count?: UserCountOrderByAggregateInput
     _max?: UserMaxOrderByAggregateInput
     _min?: UserMinOrderByAggregateInput
@@ -4664,11 +4772,17 @@ export namespace Prisma {
     OR?: UserScalarWhereWithAggregatesInput[]
     NOT?: UserScalarWhereWithAggregatesInput | UserScalarWhereWithAggregatesInput[]
     id?: StringWithAggregatesFilter<"User"> | string
-    email?: StringWithAggregatesFilter<"User"> | string
-    password?: StringWithAggregatesFilter<"User"> | string
+    email?: StringNullableWithAggregatesFilter<"User"> | string | null
+    password?: StringNullableWithAggregatesFilter<"User"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
     token?: StringNullableWithAggregatesFilter<"User"> | string | null
+    telegramId?: StringNullableWithAggregatesFilter<"User"> | string | null
+    telegramUsername?: StringNullableWithAggregatesFilter<"User"> | string | null
+    telegramFirstName?: StringNullableWithAggregatesFilter<"User"> | string | null
+    telegramLastName?: StringNullableWithAggregatesFilter<"User"> | string | null
+    telegramPhotoUrl?: StringNullableWithAggregatesFilter<"User"> | string | null
+    telegramLanguageCode?: StringNullableWithAggregatesFilter<"User"> | string | null
   }
 
   export type GemeniResponseWhereInput = {
@@ -4796,73 +4910,115 @@ export namespace Prisma {
 
   export type UserCreateInput = {
     id?: string
-    email: string
-    password: string
+    email?: string | null
+    password?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     token?: string | null
+    telegramId?: string | null
+    telegramUsername?: string | null
+    telegramFirstName?: string | null
+    telegramLastName?: string | null
+    telegramPhotoUrl?: string | null
+    telegramLanguageCode?: string | null
     balance?: UserBalanceCreateNestedOneWithoutUserInput
     gemeniResponses?: GemeniResponseCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateInput = {
     id?: string
-    email: string
-    password: string
+    email?: string | null
+    password?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     token?: string | null
+    telegramId?: string | null
+    telegramUsername?: string | null
+    telegramFirstName?: string | null
+    telegramLastName?: string | null
+    telegramPhotoUrl?: string | null
+    telegramLanguageCode?: string | null
     balance?: UserBalanceUncheckedCreateNestedOneWithoutUserInput
     gemeniResponses?: GemeniResponseUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
-    email?: StringFieldUpdateOperationsInput | string
-    password?: StringFieldUpdateOperationsInput | string
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    password?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     token?: NullableStringFieldUpdateOperationsInput | string | null
+    telegramId?: NullableStringFieldUpdateOperationsInput | string | null
+    telegramUsername?: NullableStringFieldUpdateOperationsInput | string | null
+    telegramFirstName?: NullableStringFieldUpdateOperationsInput | string | null
+    telegramLastName?: NullableStringFieldUpdateOperationsInput | string | null
+    telegramPhotoUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    telegramLanguageCode?: NullableStringFieldUpdateOperationsInput | string | null
     balance?: UserBalanceUpdateOneWithoutUserNestedInput
     gemeniResponses?: GemeniResponseUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
-    email?: StringFieldUpdateOperationsInput | string
-    password?: StringFieldUpdateOperationsInput | string
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    password?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     token?: NullableStringFieldUpdateOperationsInput | string | null
+    telegramId?: NullableStringFieldUpdateOperationsInput | string | null
+    telegramUsername?: NullableStringFieldUpdateOperationsInput | string | null
+    telegramFirstName?: NullableStringFieldUpdateOperationsInput | string | null
+    telegramLastName?: NullableStringFieldUpdateOperationsInput | string | null
+    telegramPhotoUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    telegramLanguageCode?: NullableStringFieldUpdateOperationsInput | string | null
     balance?: UserBalanceUncheckedUpdateOneWithoutUserNestedInput
     gemeniResponses?: GemeniResponseUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateManyInput = {
     id?: string
-    email: string
-    password: string
+    email?: string | null
+    password?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     token?: string | null
+    telegramId?: string | null
+    telegramUsername?: string | null
+    telegramFirstName?: string | null
+    telegramLastName?: string | null
+    telegramPhotoUrl?: string | null
+    telegramLanguageCode?: string | null
   }
 
   export type UserUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
-    email?: StringFieldUpdateOperationsInput | string
-    password?: StringFieldUpdateOperationsInput | string
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    password?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     token?: NullableStringFieldUpdateOperationsInput | string | null
+    telegramId?: NullableStringFieldUpdateOperationsInput | string | null
+    telegramUsername?: NullableStringFieldUpdateOperationsInput | string | null
+    telegramFirstName?: NullableStringFieldUpdateOperationsInput | string | null
+    telegramLastName?: NullableStringFieldUpdateOperationsInput | string | null
+    telegramPhotoUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    telegramLanguageCode?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type UserUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
-    email?: StringFieldUpdateOperationsInput | string
-    password?: StringFieldUpdateOperationsInput | string
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    password?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     token?: NullableStringFieldUpdateOperationsInput | string | null
+    telegramId?: NullableStringFieldUpdateOperationsInput | string | null
+    telegramUsername?: NullableStringFieldUpdateOperationsInput | string | null
+    telegramFirstName?: NullableStringFieldUpdateOperationsInput | string | null
+    telegramLastName?: NullableStringFieldUpdateOperationsInput | string | null
+    telegramPhotoUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    telegramLanguageCode?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type GemeniResponseCreateInput = {
@@ -5043,17 +5199,6 @@ export namespace Prisma {
     _max?: NestedIntFilter<$PrismaModel>
   }
 
-  export type DateTimeFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeFilter<$PrismaModel> | Date | string
-  }
-
   export type StringNullableFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel> | null
     in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
@@ -5067,6 +5212,17 @@ export namespace Prisma {
     endsWith?: string | StringFieldRefInput<$PrismaModel>
     mode?: QueryMode
     not?: NestedStringNullableFilter<$PrismaModel> | string | null
+  }
+
+  export type DateTimeFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeFilter<$PrismaModel> | Date | string
   }
 
   export type UserBalanceNullableScalarRelationFilter = {
@@ -5096,6 +5252,12 @@ export namespace Prisma {
     createdAt?: SortOrder
     updatedAt?: SortOrder
     token?: SortOrder
+    telegramId?: SortOrder
+    telegramUsername?: SortOrder
+    telegramFirstName?: SortOrder
+    telegramLastName?: SortOrder
+    telegramPhotoUrl?: SortOrder
+    telegramLanguageCode?: SortOrder
   }
 
   export type UserMaxOrderByAggregateInput = {
@@ -5105,6 +5267,12 @@ export namespace Prisma {
     createdAt?: SortOrder
     updatedAt?: SortOrder
     token?: SortOrder
+    telegramId?: SortOrder
+    telegramUsername?: SortOrder
+    telegramFirstName?: SortOrder
+    telegramLastName?: SortOrder
+    telegramPhotoUrl?: SortOrder
+    telegramLanguageCode?: SortOrder
   }
 
   export type UserMinOrderByAggregateInput = {
@@ -5114,20 +5282,12 @@ export namespace Prisma {
     createdAt?: SortOrder
     updatedAt?: SortOrder
     token?: SortOrder
-  }
-
-  export type DateTimeWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeWithAggregatesFilter<$PrismaModel> | Date | string
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedDateTimeFilter<$PrismaModel>
-    _max?: NestedDateTimeFilter<$PrismaModel>
+    telegramId?: SortOrder
+    telegramUsername?: SortOrder
+    telegramFirstName?: SortOrder
+    telegramLastName?: SortOrder
+    telegramPhotoUrl?: SortOrder
+    telegramLanguageCode?: SortOrder
   }
 
   export type StringNullableWithAggregatesFilter<$PrismaModel = never> = {
@@ -5146,6 +5306,20 @@ export namespace Prisma {
     _count?: NestedIntNullableFilter<$PrismaModel>
     _min?: NestedStringNullableFilter<$PrismaModel>
     _max?: NestedStringNullableFilter<$PrismaModel>
+  }
+
+  export type DateTimeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeWithAggregatesFilter<$PrismaModel> | Date | string
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedDateTimeFilter<$PrismaModel>
+    _max?: NestedDateTimeFilter<$PrismaModel>
   }
 
   export type GemeniResponseCountOrderByAggregateInput = {
@@ -5247,12 +5421,12 @@ export namespace Prisma {
     connect?: GemeniResponseWhereUniqueInput | GemeniResponseWhereUniqueInput[]
   }
 
-  export type DateTimeFieldUpdateOperationsInput = {
-    set?: Date | string
-  }
-
   export type NullableStringFieldUpdateOperationsInput = {
     set?: string | null
+  }
+
+  export type DateTimeFieldUpdateOperationsInput = {
+    set?: Date | string
   }
 
   export type UserBalanceUpdateOneWithoutUserNestedInput = {
@@ -5386,17 +5560,6 @@ export namespace Prisma {
     not?: NestedFloatFilter<$PrismaModel> | number
   }
 
-  export type NestedDateTimeFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeFilter<$PrismaModel> | Date | string
-  }
-
   export type NestedStringNullableFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel> | null
     in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
@@ -5411,7 +5574,7 @@ export namespace Prisma {
     not?: NestedStringNullableFilter<$PrismaModel> | string | null
   }
 
-  export type NestedDateTimeWithAggregatesFilter<$PrismaModel = never> = {
+  export type NestedDateTimeFilter<$PrismaModel = never> = {
     equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
     notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
@@ -5419,10 +5582,7 @@ export namespace Prisma {
     lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeWithAggregatesFilter<$PrismaModel> | Date | string
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedDateTimeFilter<$PrismaModel>
-    _max?: NestedDateTimeFilter<$PrismaModel>
+    not?: NestedDateTimeFilter<$PrismaModel> | Date | string
   }
 
   export type NestedStringNullableWithAggregatesFilter<$PrismaModel = never> = {
@@ -5453,23 +5613,49 @@ export namespace Prisma {
     not?: NestedIntNullableFilter<$PrismaModel> | number | null
   }
 
+  export type NestedDateTimeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeWithAggregatesFilter<$PrismaModel> | Date | string
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedDateTimeFilter<$PrismaModel>
+    _max?: NestedDateTimeFilter<$PrismaModel>
+  }
+
   export type UserCreateWithoutBalanceInput = {
     id?: string
-    email: string
-    password: string
+    email?: string | null
+    password?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     token?: string | null
+    telegramId?: string | null
+    telegramUsername?: string | null
+    telegramFirstName?: string | null
+    telegramLastName?: string | null
+    telegramPhotoUrl?: string | null
+    telegramLanguageCode?: string | null
     gemeniResponses?: GemeniResponseCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutBalanceInput = {
     id?: string
-    email: string
-    password: string
+    email?: string | null
+    password?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     token?: string | null
+    telegramId?: string | null
+    telegramUsername?: string | null
+    telegramFirstName?: string | null
+    telegramLastName?: string | null
+    telegramPhotoUrl?: string | null
+    telegramLanguageCode?: string | null
     gemeniResponses?: GemeniResponseUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -5491,21 +5677,33 @@ export namespace Prisma {
 
   export type UserUpdateWithoutBalanceInput = {
     id?: StringFieldUpdateOperationsInput | string
-    email?: StringFieldUpdateOperationsInput | string
-    password?: StringFieldUpdateOperationsInput | string
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    password?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     token?: NullableStringFieldUpdateOperationsInput | string | null
+    telegramId?: NullableStringFieldUpdateOperationsInput | string | null
+    telegramUsername?: NullableStringFieldUpdateOperationsInput | string | null
+    telegramFirstName?: NullableStringFieldUpdateOperationsInput | string | null
+    telegramLastName?: NullableStringFieldUpdateOperationsInput | string | null
+    telegramPhotoUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    telegramLanguageCode?: NullableStringFieldUpdateOperationsInput | string | null
     gemeniResponses?: GemeniResponseUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutBalanceInput = {
     id?: StringFieldUpdateOperationsInput | string
-    email?: StringFieldUpdateOperationsInput | string
-    password?: StringFieldUpdateOperationsInput | string
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    password?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     token?: NullableStringFieldUpdateOperationsInput | string | null
+    telegramId?: NullableStringFieldUpdateOperationsInput | string | null
+    telegramUsername?: NullableStringFieldUpdateOperationsInput | string | null
+    telegramFirstName?: NullableStringFieldUpdateOperationsInput | string | null
+    telegramLastName?: NullableStringFieldUpdateOperationsInput | string | null
+    telegramPhotoUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    telegramLanguageCode?: NullableStringFieldUpdateOperationsInput | string | null
     gemeniResponses?: GemeniResponseUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -5612,21 +5810,33 @@ export namespace Prisma {
 
   export type UserCreateWithoutGemeniResponsesInput = {
     id?: string
-    email: string
-    password: string
+    email?: string | null
+    password?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     token?: string | null
+    telegramId?: string | null
+    telegramUsername?: string | null
+    telegramFirstName?: string | null
+    telegramLastName?: string | null
+    telegramPhotoUrl?: string | null
+    telegramLanguageCode?: string | null
     balance?: UserBalanceCreateNestedOneWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutGemeniResponsesInput = {
     id?: string
-    email: string
-    password: string
+    email?: string | null
+    password?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     token?: string | null
+    telegramId?: string | null
+    telegramUsername?: string | null
+    telegramFirstName?: string | null
+    telegramLastName?: string | null
+    telegramPhotoUrl?: string | null
+    telegramLanguageCode?: string | null
     balance?: UserBalanceUncheckedCreateNestedOneWithoutUserInput
   }
 
@@ -5648,21 +5858,33 @@ export namespace Prisma {
 
   export type UserUpdateWithoutGemeniResponsesInput = {
     id?: StringFieldUpdateOperationsInput | string
-    email?: StringFieldUpdateOperationsInput | string
-    password?: StringFieldUpdateOperationsInput | string
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    password?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     token?: NullableStringFieldUpdateOperationsInput | string | null
+    telegramId?: NullableStringFieldUpdateOperationsInput | string | null
+    telegramUsername?: NullableStringFieldUpdateOperationsInput | string | null
+    telegramFirstName?: NullableStringFieldUpdateOperationsInput | string | null
+    telegramLastName?: NullableStringFieldUpdateOperationsInput | string | null
+    telegramPhotoUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    telegramLanguageCode?: NullableStringFieldUpdateOperationsInput | string | null
     balance?: UserBalanceUpdateOneWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutGemeniResponsesInput = {
     id?: StringFieldUpdateOperationsInput | string
-    email?: StringFieldUpdateOperationsInput | string
-    password?: StringFieldUpdateOperationsInput | string
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    password?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     token?: NullableStringFieldUpdateOperationsInput | string | null
+    telegramId?: NullableStringFieldUpdateOperationsInput | string | null
+    telegramUsername?: NullableStringFieldUpdateOperationsInput | string | null
+    telegramFirstName?: NullableStringFieldUpdateOperationsInput | string | null
+    telegramLastName?: NullableStringFieldUpdateOperationsInput | string | null
+    telegramPhotoUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    telegramLanguageCode?: NullableStringFieldUpdateOperationsInput | string | null
     balance?: UserBalanceUncheckedUpdateOneWithoutUserNestedInput
   }
 
