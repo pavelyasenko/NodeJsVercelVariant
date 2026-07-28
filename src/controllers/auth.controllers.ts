@@ -10,7 +10,7 @@ export const loginHandler = async (req:Request, res:Response): Promise<void> => 
     }catch(error:any) {
         res.status(400).json({message: error.message})
     }
-}
+};
 
 export const registerHandler = async (req:Request, res:Response): Promise<void> => {
     try {
@@ -21,7 +21,32 @@ export const registerHandler = async (req:Request, res:Response): Promise<void> 
     }catch(error:any) {
         res.status(401).json({message: error.message})
     }
-}
+};
+
+export const telegramAuthHandler = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
+  try {
+    const initData =
+      typeof req.body?.initData === "string" ? req.body.initData : "";
+
+    if (!initData) {
+      res.status(400).json({
+        message: "Telegram authorization data is required",
+      });
+      return;
+    }
+
+    const result = await AuthService.loginWithTelegram({ initData });
+
+    res.status(200).json(result);
+  } catch (error: unknown) {
+    res.status(401).json({
+      message: getErrorMessage(error),
+    });
+  }
+};
 
 export const logoutHandler = async (req:Request, res:Response): Promise<void> => {
     try {
@@ -32,7 +57,7 @@ export const logoutHandler = async (req:Request, res:Response): Promise<void> =>
     }catch(error:any) {
         res.status(401).json({message: error.message})
     }
-}
+};
 
 export const changePasswordHandler = async(req:Request, res:Response):Promise<void> =>{
     try {
@@ -45,4 +70,4 @@ export const changePasswordHandler = async(req:Request, res:Response):Promise<vo
         res.status(401).json({message: error.message})
         
     }
-}
+};
