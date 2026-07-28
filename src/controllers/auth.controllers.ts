@@ -1,6 +1,14 @@
 import { Request, Response } from "express";
 import { AuthService } from "../services/auth.service.js";
 
+const getErrorMessage = (
+  error: unknown,
+): string => {
+  return error instanceof Error
+    ? error.message
+    : "Unknown authentication error";
+};
+
 export const loginHandler = async (req:Request, res:Response): Promise<void> => {
     try {
         const {email, password} = req.body
