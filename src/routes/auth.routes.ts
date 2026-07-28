@@ -5,6 +5,7 @@ import {
   logoutHandler,
   registerHandler,
   telegramLoginHandler,
+  telegramWebAppLoginHandler,
 } from "../controllers/auth.controllers.js";
 import { authMiddleware } from "../middlewares/auth.middleware.js";
 
@@ -13,7 +14,17 @@ const router = Router();
 router.post("/login", loginHandler);
 router.post("/register", registerHandler);
 router.post("/telegram", telegramLoginHandler);
-router.post("/logout", authMiddleware, logoutHandler);
+router.post(
+  "/telegram-webapp",
+  telegramWebAppLoginHandler,
+);
+
+router.post(
+  "/logout",
+  authMiddleware,
+  logoutHandler,
+);
+
 router.post(
   "/change-password",
   authMiddleware,
