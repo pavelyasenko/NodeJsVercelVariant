@@ -1,119 +1,25 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
-import { Buffer } from "node:buffer";
+import {
+  IMAGE_QUERY_STOP_WORDS,
+  IMAGE_RELEVANCE_CONFIG,
+  PEXELS_CONFIG,
+} from "../config/pexels.config.js";
+import type {
+  GetImageOptions,
+  PexelsOrientation,
+  PexelsPhoto,
+  PexelsSearchResponse,
+  RankedPexelsCandidate,
+  SelectedPexelsPhoto,
+  SelectPexelsPhotoOptions,
+} from "../types/pexels.types.js";
+import { normalizeSearchText } from "../utils/text.utils.js";
 import { generateImageWithGemini } from "./imageGeneration.service.js";
 import { decideImageSource } from "./imageSourceDecision.service.js";
-
-type PexelsOrientation = "landscape" | "portrait" | "square";
-
-interface GetImageOptions {
-  orientation?: PexelsOrientation;
-  perPage?: number;
-}
-
-interface PexelsPhoto {
-  id: number;
-  width: number;
-  height: number;
-  alt?: string;
-  src: {
-    original?: string;
-    large2x?: string;
-    large?: string;
-    landscape?: string;
-    portrait?: string;
-    medium?: string;
-  };
-}
-
-interface PexelsSearchResponse {
-  photos?: PexelsPhoto[];
-}
-
-const PEXELS_RESULTS_PER_QUERY = 24;
-const PEXELS_REQUEST_TIMEOUT_MS = 12_000;
-const IMAGE_RELEVANCE_MODEL =
-  process.env.GEMINI_IMAGE_RELEVANCE_MODEL?.trim() || "gemini-2.5-flash-lite";
-const IMAGE_RELEVANCE_CANDIDATE_COUNT = 5;
-const IMAGE_RELEVANCE_MIN_CONFIDENCE = 0.6;
-const IMAGE_RELEVANCE_REQUEST_TIMEOUT_MS = 12_000;
-
-interface RankedPexelsCandidate {
-  photo: PexelsPhoto;
-  url: string;
-  score: number;
-  index: number;
-}
-
-interface ImageInlinePart {
-  inlineData: {
-    data: string;
-    mimeType: string;
-  };
-}
-
-interface ImageRelevanceDecision {
-  selectedIndex: number | null;
-  confidence?: number;
-  reason?: string;
-}
-
-const IMAGE_QUERY_STOP_WORDS = new Set([
-  "and",
-  "the",
-  "with",
-  "from",
-  "into",
-  "for",
-  "of",
-  "on",
-  "in",
-  "at",
-  "wide",
-  "photo",
-  "photos",
-  "photography",
-  "shot",
-  "close",
-  "up",
-  "commercial",
-  "editorial",
-  "background",
-  "business",
-  "specific",
-  "natural",
-  "modern",
-  "professional",
-  "small",
-  "large",
-  "premium",
-  "customer",
-  "customers",
-  "product",
-  "products",
-  "service",
-  "services",
-  "detail",
-  "details",
-  "display",
-  "lifestyle",
-  "interior",
-  "exterior",
-]);
-
-const normalizeSearchText = (value: string): string =>
-  value
-    .normalize("NFKD")
-    .replace(/\p{M}/gu, "")
-    .toLocaleLowerCase()
-    .replace(/[’'`]/g, "")
-    .replace(/-/g, " ")
-    .replace(/[^\p{L}\p{N}\s]/gu, " ")
-    .replace(/\s+/g, " ")
-    .trim();
+import { selectPexelsCandidateWithGemini } from "./imageRelevance.service.js";
 
 const getMeaningfulQueryWords = (query: string): string[] =>
-  [
-    ...new Set(
+  Array.from(
+    new Set(
       normalizeSearchText(query)
         .split(" ")
         .filter(
@@ -123,7 +29,7 @@ const getMeaningfulQueryWords = (query: string): string[] =>
             !/^\d+$/.test(word),
         ),
     ),
-  ];
+  );
 
 const escapeXml = (value: string): string =>
   value.replace(/[&<>"']/g, (character) => {
@@ -156,7 +62,7 @@ const createFallbackImage = (query: string): string =>
     </svg>
   `);
 
-const getPhotoUrl = (
+export const getPexelsPhotoUrl = (
   photo: PexelsPhoto,
   orientation: PexelsOrientation,
 ): string | null => {
@@ -201,17 +107,7 @@ const scorePhoto = (
   return matchedWords.length * 10 + orientationScore - index * 0.25;
 };
 
-const getRequiredSemanticMatchCount = (
-  queryWords: readonly string[],
-): number => {
-  if (queryWords.length <= 1) {
-    return queryWords.length;
-  }
-
-  return 1;
-};
-
-const isRelevantPhoto = (photo: PexelsPhoto, query: string): boolean => {
+const hasSemanticMatch = (photo: PexelsPhoto, query: string): boolean => {
   const queryWords = getMeaningfulQueryWords(query);
 
   if (queryWords.length === 0) {
@@ -220,236 +116,22 @@ const isRelevantPhoto = (photo: PexelsPhoto, query: string): boolean => {
 
   const altText = normalizeSearchText(photo.alt ?? "");
 
-  if (!altText) {
-    return false;
-  }
-
-  const matchedWords = queryWords.filter((word) => altText.includes(word));
-
-  return matchedWords.length >= getRequiredSemanticMatchCount(queryWords);
+  return Boolean(altText) && queryWords.some((word) => altText.includes(word));
 };
 
-const fetchImageInlinePart = async (
-  url: string,
-): Promise<ImageInlinePart | null> => {
-  const controller = new AbortController();
-  const timeout = setTimeout(
-    () => controller.abort(),
-    IMAGE_RELEVANCE_REQUEST_TIMEOUT_MS,
-  );
-
-  try {
-    const response = await fetch(url, { signal: controller.signal });
-
-    if (!response.ok) {
-      return null;
-    }
-
-    const mimeType = response.headers.get("content-type") ?? "image/jpeg";
-
-    if (!mimeType.startsWith("image/")) {
-      return null;
-    }
-
-    const buffer = Buffer.from(await response.arrayBuffer());
-
-    return {
-      inlineData: {
-        data: buffer.toString("base64"),
-        mimeType,
-      },
-    };
-  } catch {
-    return null;
-  } finally {
-    clearTimeout(timeout);
-  }
-};
-
-const parseImageRelevanceDecision = (
-  value: string,
-): ImageRelevanceDecision | null => {
-  const match = value.match(/\{[\s\S]*\}/);
-
-  if (!match) {
-    return null;
-  }
-
-  try {
-    const parsed: unknown = JSON.parse(match[0]);
-
-    if (!parsed || typeof parsed !== "object") {
-      return null;
-    }
-
-    const decision = parsed as Partial<ImageRelevanceDecision>;
-
-    if (
-      decision.selectedIndex !== null &&
-      typeof decision.selectedIndex !== "number"
-    ) {
-      return null;
-    }
-
-    return {
-      selectedIndex: decision.selectedIndex ?? null,
-      confidence:
-        typeof decision.confidence === "number"
-          ? decision.confidence
-          : undefined,
-      reason:
-        typeof decision.reason === "string" ? decision.reason : undefined,
-    };
-  } catch {
-    return null;
-  }
-};
-
-const selectPhotoWithGeminiVision = async (
-  query: string,
-  candidates: readonly RankedPexelsCandidate[],
-): Promise<RankedPexelsCandidate | null> => {
-  const apiKey = process.env.GEMINI_API_KEY?.trim();
-
-  if (!apiKey || candidates.length === 0) {
-    return null;
-  }
-
-  try {
-    const imageParts = await Promise.all(
-      candidates.map(async (candidate) => {
-        const part = await fetchImageInlinePart(candidate.url);
-
-        return part ? { candidate, part } : null;
-      }),
-    );
-    const validParts = imageParts.filter(
-      (
-        item,
-      ): item is {
-        candidate: RankedPexelsCandidate;
-        part: ImageInlinePart;
-      } => Boolean(item),
-    );
-
-    if (validParts.length === 0) {
-      return candidates[0] ?? null;
-    }
-
-    const model = new GoogleGenerativeAI(apiKey).getGenerativeModel({
-      model: IMAGE_RELEVANCE_MODEL,
-      generationConfig: {
-        temperature: 0,
-        topP: 0.1,
-        maxOutputTokens: 400,
-      },
-    });
-    const prompt = `
-You are choosing a stock photo for a generated commercial landing page.
-
-Search query: "${query}"
-
-Pick the single image that visually matches the query best.
-Reject images that do not clearly show the requested object, place, service, dish, person, or action.
-Do not choose an image only because colors, mood, or general category are similar.
-
-Candidate indexes and Pexels alt text:
-${validParts
-  .map(
-    ({ candidate }, index) =>
-      `${index}. ${candidate.photo.alt?.trim() || "No alt text"}`,
-  )
-  .join("\n")}
-
-Return only JSON in this exact shape:
-{"selectedIndex": number | null, "confidence": number, "reason": "short reason"}
-Use selectedIndex:null when none of the images clearly match the query.
-`.trim();
-    const response = await model.generateContent([
-      prompt,
-      ...validParts.map(({ part }) => part),
-    ]);
-    const decision = parseImageRelevanceDecision(response.response.text());
-
-    if (
-      !decision ||
-      decision.selectedIndex === null ||
-      decision.selectedIndex < 0 ||
-      decision.selectedIndex >= validParts.length ||
-      (decision.confidence ?? 0) < IMAGE_RELEVANCE_MIN_CONFIDENCE
-    ) {
-      return null;
-    }
-
-    return validParts[decision.selectedIndex].candidate;
-  } catch {
-    return candidates[0] ?? null;
-  }
-};
-
-const selectBestPhoto = async (
-  photos: readonly PexelsPhoto[],
+export const searchPexelsCandidates = async (
   query: string,
   orientation: PexelsOrientation,
-): Promise<PexelsPhoto | null> => {
-  const rankedCandidates = photos
-    .map((photo, index) => {
-      const url = getPhotoUrl(photo, orientation)?.trim();
-
-      return url
-        ? {
-            photo,
-            url,
-            index,
-            score: scorePhoto(photo, query, index, orientation),
-          }
-        : null;
-    })
-    .filter((candidate): candidate is RankedPexelsCandidate =>
-      Boolean(candidate),
-    )
-    .filter(({ photo }) => isRelevantPhoto(photo, query))
-    .sort((left, right) => right.score - left.score || left.index - right.index);
-
-  const selected = await selectPhotoWithGeminiVision(
-    query,
-    rankedCandidates.slice(0, IMAGE_RELEVANCE_CANDIDATE_COUNT),
-  );
-
-  return selected?.photo ?? null;
-};
-
-export async function getImage(
-  query: string,
-  options: GetImageOptions = {},
-): Promise<string> {
+  perPage: number = PEXELS_CONFIG.resultsPerQuery,
+): Promise<PexelsPhoto[]> => {
   const apiKey = process.env.PEXELS_API_KEY?.trim();
-  const cleanQuery = query.trim();
-  const orientation = options.orientation ?? "landscape";
-  const perPage = options.perPage ?? PEXELS_RESULTS_PER_QUERY;
-
-  if (!cleanQuery) {
-    return createFallbackImage("Generated website image");
-  }
-
-  if ((await decideImageSource({ query: cleanQuery })) === "generate") {
-    return (
-      (await generateImageWithGemini(cleanQuery, {
-        slot: "standalone image",
-      })) ?? createFallbackImage(cleanQuery)
-    );
-  }
 
   if (!apiKey) {
-    return (
-      (await generateImageWithGemini(cleanQuery, {
-        slot: "standalone image",
-      })) ?? createFallbackImage(cleanQuery)
-    );
+    throw new Error("PEXELS_API_KEY is not configured");
   }
 
   const params = new URLSearchParams({
-    query: cleanQuery,
+    query,
     orientation,
     size: "medium",
     locale: "en-US",
@@ -459,7 +141,7 @@ export async function getImage(
   const controller = new AbortController();
   const timeout = setTimeout(
     () => controller.abort(),
-    PEXELS_REQUEST_TIMEOUT_MS,
+    PEXELS_CONFIG.requestTimeoutMs,
   );
 
   try {
@@ -472,40 +154,100 @@ export async function getImage(
     );
 
     if (!response.ok) {
-      return (
-        (await generateImageWithGemini(cleanQuery, {
-          slot: "standalone image",
-        })) ?? createFallbackImage(cleanQuery)
-      );
+      throw new Error(`Pexels returned HTTP ${response.status}`);
     }
 
     const data = (await response.json()) as PexelsSearchResponse;
-    const photos = Array.isArray(data.photos) ? data.photos : [];
-    const selectedPhoto = await selectBestPhoto(
-      photos,
-      cleanQuery,
-      orientation,
-    );
-    const selectedUrl = selectedPhoto
-      ? getPhotoUrl(selectedPhoto, orientation)
-      : null;
 
-    if (selectedUrl) {
-      return selectedUrl;
-    }
-
-    return (
-      (await generateImageWithGemini(cleanQuery, {
-        slot: "standalone image",
-      })) ?? createFallbackImage(cleanQuery)
-    );
-  } catch {
-    return (
-      (await generateImageWithGemini(cleanQuery, {
-        slot: "standalone image",
-      })) ?? createFallbackImage(cleanQuery)
-    );
+    return Array.isArray(data.photos) ? data.photos : [];
   } finally {
     clearTimeout(timeout);
   }
-}
+};
+
+export const selectUniquePexelsPhoto = async (
+  options: SelectPexelsPhotoOptions,
+): Promise<SelectedPexelsPhoto | null> => {
+  const usedPhotoIds = options.usedPhotoIds ?? new Set<number>();
+  const usedImageUrls = options.usedImageUrls ?? new Set<string>();
+  const rankedCandidates = options.photos
+    .map((photo, index): RankedPexelsCandidate | null => {
+      const url = getPexelsPhotoUrl(photo, options.orientation)?.trim();
+
+      return url
+        ? {
+            photo,
+            url,
+            index,
+            score: scorePhoto(photo, options.query, index, options.orientation),
+          }
+        : null;
+    })
+    .filter(
+      (candidate): candidate is RankedPexelsCandidate => candidate !== null,
+    )
+    .filter(
+      ({ photo, url }) =>
+        (options.skipSemanticMatch ||
+          hasSemanticMatch(photo, options.query)) &&
+        !usedPhotoIds.has(photo.id) &&
+        !usedImageUrls.has(url),
+    )
+    .sort((left, right) => right.score - left.score || left.index - right.index);
+
+  const selected = await selectPexelsCandidateWithGemini(
+    options.query,
+    options.context ?? "standalone image",
+    rankedCandidates.slice(0, IMAGE_RELEVANCE_CONFIG.candidateCount),
+  );
+
+  return selected
+    ? {
+        photo: selected.photo,
+        url: selected.url,
+      }
+    : null;
+};
+
+const generateFallback = async (query: string): Promise<string> =>
+  (await generateImageWithGemini(query, { slot: "standalone image" })) ??
+  createFallbackImage(query);
+
+export const getImage = async (
+  query: string,
+  options: GetImageOptions = {},
+): Promise<string> => {
+  const cleanQuery = query.trim();
+  const orientation = options.orientation ?? "landscape";
+
+  if (!cleanQuery) {
+    return createFallbackImage("Generated website image");
+  }
+
+  const hasPexelsApiKey = Boolean(process.env.PEXELS_API_KEY?.trim());
+  const source = await decideImageSource({
+    query: cleanQuery,
+    hasConfiguredStockQueries: hasPexelsApiKey,
+  });
+
+  if (source === "generate" || !hasPexelsApiKey) {
+    return generateFallback(cleanQuery);
+  }
+
+  try {
+    const photos = await searchPexelsCandidates(
+      cleanQuery,
+      orientation,
+      options.perPage,
+    );
+    const selected = await selectUniquePexelsPhoto({
+      photos,
+      query: cleanQuery,
+      orientation,
+    });
+
+    return selected?.url ?? (await generateFallback(cleanQuery));
+  } catch {
+    return generateFallback(cleanQuery);
+  }
+};
